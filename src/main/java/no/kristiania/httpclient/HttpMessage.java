@@ -13,8 +13,12 @@ public class HttpMessage {
     public HttpMessage(Socket socket) throws IOException {
         startLine = readLine(socket);
         headers = readHeaders(socket);
-        int contentLength = Integer.parseInt(headers.get("Content-Length"));
-        body = HttpMessage.readBody(socket, contentLength);
+        String contentLength = headers.get("Content-Length");
+        if (contentLength != null){
+            body = HttpMessage.readBody(socket, Integer.parseInt(contentLength));
+        }else{
+            body = null;
+        }
     }
 
     public static  String readLine(Socket socket) throws IOException {

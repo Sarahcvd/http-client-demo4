@@ -36,7 +36,8 @@ public class HttpServer {
 
     // This code will be executed for each client (connection)
     private static void handleRequest(Socket clientSocket) throws IOException {
-        String requestLine = HttpMessage.readLine(clientSocket);
+        HttpMessage request = new HttpMessage(clientSocket);
+        String requestLine = request.getStartLine();
         System.out.println(requestLine);
         // Example "GET /echo?body=hello HTTP/1.1"  (this is what the browser writes)
 
