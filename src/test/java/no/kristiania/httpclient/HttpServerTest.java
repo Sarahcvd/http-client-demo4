@@ -84,13 +84,13 @@ class HttpServerTest {
         assertEquals(List.of("wali"), server.getWorkerNames());
     }
 
-    /*@Test
+    @Test
     void shouldReturnExistingMembers() throws IOException {
         HttpServer server = new HttpServer(10009);
         server.getWorkerNames().add("wali");
         HttpClient client = new HttpClient("localhost", 10009, "/api/members");
         assertEquals("<ul><li>wali</li></ul>", client.getResponseBody());
-    }*/
+    }
 
 
 }
