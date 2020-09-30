@@ -52,7 +52,6 @@ class HttpServerTest {
         HttpClient client = new HttpClient("localhost", 10005, "/test.txt");
         assertEquals(fileContent, client.getResponseBody());
         assertEquals("text/plain", client.getResponseHeader("Content-Type"));
-
     }
 
     @Test
@@ -61,9 +60,9 @@ class HttpServerTest {
         File contentRoot = new File("target/");
         server.setContentRoot(contentRoot);
 
-        Files.writeString(new File(contentRoot,"index.html").toPath(), "<h2>Hello World</h2>");
+        Files.writeString(new File(contentRoot,"showWorker.html").toPath(), "<h2>Hello World</h2>");
 
-        HttpClient client = new HttpClient("localhost", 10006, "/index.html");
+        HttpClient client = new HttpClient("localhost", 10006, "/showWorker.html");
         assertEquals("text/html", client.getResponseHeader("Content-Type"));
     }
 
@@ -80,8 +79,18 @@ class HttpServerTest {
     @Test
     void shouldPostNewProduct() throws IOException {
         HttpServer server = new HttpServer(10008);
-        HttpClient client = new HttpClient("localhost", 10008, "/api/newProduct", "POST", "productName=apples&price=10");
+        HttpClient client = new HttpClient("localhost", 10008, "/api/newWorker", "POST", "full_name=wali&email_address=wgbjork@gmail.com");
         assertEquals(200, client.getStatusCode());
-        assertEquals(List.of("apples"), server.getProductNames());
+        assertEquals(List.of("wali"), server.getWorkerNames());
     }
+
+    /*@Test
+    void shouldReturnExistingMembers() throws IOException {
+        HttpServer server = new HttpServer(10009);
+        server.getWorkerNames().add("wali");
+        HttpClient client = new HttpClient("localhost", 10009, "/api/members");
+        assertEquals("<ul><li>wali</li></ul>", client.getResponseBody());
+    }*/
+
+
 }
