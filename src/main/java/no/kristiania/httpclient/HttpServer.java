@@ -6,10 +6,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HttpServer {
 
     private static File contentRoot;
+    private List<String> productNames = new ArrayList<>();
 
     public HttpServer(int port) throws IOException {
         // Open an entry point to our program for network clients
@@ -33,7 +36,7 @@ public class HttpServer {
 
     // This code will be executed for each client (connection)
     private static void handleRequest(Socket clientSocket) throws IOException {
-        String requestLine = HttpClient.readLine(clientSocket);
+        String requestLine = HttpMessage.readLine(clientSocket);
         System.out.println(requestLine);
         // Example "GET /echo?body=hello HTTP/1.1"  (this is what the browser writes)
 
@@ -67,6 +70,9 @@ public class HttpServer {
                 clientSocket.getOutputStream().write(response.getBytes());
                 return;
             }
+
+
+
             statusCode = "200";
             String contentType = "text/plain";
             if (file.getName().endsWith(".html")){
@@ -79,6 +85,7 @@ public class HttpServer {
             clientSocket.getOutputStream().write(response.getBytes());
 
             new FileInputStream(file).transferTo(clientSocket.getOutputStream());
+            //return;
         }
 
         String response = "HTTP/1.1 " + statusCode + " OK\r\n" +
@@ -99,5 +106,9 @@ public class HttpServer {
     public void setContentRoot(File contentRoot) {
         this.contentRoot = contentRoot;
 
+    }
+
+    public List<String> getProductNames() {
+        return productNames;
     }
 }
