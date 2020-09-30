@@ -15,7 +15,7 @@ public class HttpMessage {
         headers = readHeaders(socket);
         String contentLength = headers.get("Content-Length");
         if (contentLength != null){
-            body = HttpMessage.readBody(socket, Integer.parseInt(contentLength));
+            body = readBody(socket, Integer.parseInt(contentLength));
         }else{
             body = null;
         }
