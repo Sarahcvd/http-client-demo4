@@ -2,14 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Show members file</title>
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-Hello members
+    <h1>Workers</h1>
+    <div id="showWorkers"></div>
 </body>
 <script>
-    fetch("/api/members").then(response => response.text()).then(html => {
-        document.getElementById("members").innerHTML = html;
-    });
+    const workers = document.getElementById("showWorkers");
+    fetch("/api/showWorkers")
+        .then(resp => resp.text())
+        .then(html => showWorkers.innerHTML = html);
 </script>
 </html>
