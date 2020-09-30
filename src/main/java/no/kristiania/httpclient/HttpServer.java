@@ -12,7 +12,7 @@ import java.util.List;
 public class HttpServer {
 
     private static File contentRoot;
-    private List<String> productNames = new ArrayList<>();
+    private static List<String> productNames = new ArrayList<>();
 
     public HttpServer(int port) throws IOException {
         // Open an entry point to our program for network clients
@@ -41,6 +41,9 @@ public class HttpServer {
         System.out.println(requestLine);
         // Example "GET /echo?body=hello HTTP/1.1"  (this is what the browser writes)
 
+        // Example GET, POST, PUT, DELETE etc
+        String requestMethod = requestLine.split(" ")[0];
+
         String requestTarget = requestLine.split(" ")[1];
         // Example "GET /echo?body=hello"
         String statusCode = "200";
@@ -51,15 +54,28 @@ public class HttpServer {
         String requestPath = questionPos != -1 ? requestTarget.substring(0, questionPos) : requestTarget;
 
         // Looking for query-parts (if (query-parts) );
-        if(questionPos != -1){
+        if(questionPos != -1) {
             // "body=hello"
-            QueryString queryString = new QueryString(requestTarget.substring(questionPos+1));
-            if(queryString.getParameter("status") != null){
+            QueryString queryString = new QueryString(requestTarget.substring(questionPos + 1));
+            if (queryString.getParameter("status") != null) {
                 statusCode = queryString.getParameter("status");
             }
-            if(queryString.getParameter("body") != null){
+            if (queryString.getParameter("body") != null) {
                 body = queryString.getParameter("body");
             }
+        } else if(requestMethod.equals("POST")){
+            QueryString requestedParameter = new QueryString(request.getBody());
+
+            productNames.add(requestedParameter.getParameter("productName"));
+
+            body = "Okay";
+            String response = "HTTP/1.1 200 OK\r\n" +
+                    "Content-Length: " + body.length() + "\r\n" +
+                    "\r\n" +
+                    body;
+            clientSocket.getOutputStream().write(response.getBytes());
+
+            return;
         } else if(!requestPath.equals("/echo")){
             File file = new File(contentRoot, requestPath);
             if (!file.exists()){
