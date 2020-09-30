@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Date;
+import java.util.List;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,7 +52,6 @@ class HttpServerTest {
         HttpClient client = new HttpClient("localhost", 10005, "/test.txt");
         assertEquals(fileContent, client.getResponseBody());
         assertEquals("text/plain", client.getResponseHeader("Content-Type"));
-
     }
 
     @Test
@@ -60,9 +60,9 @@ class HttpServerTest {
         File contentRoot = new File("target/");
         server.setContentRoot(contentRoot);
 
-        Files.writeString(new File(contentRoot,"index.html").toPath(), "<h2>Hello World</h2>");
+        Files.writeString(new File(contentRoot,"showWorker.html").toPath(), "<h2>Hello World</h2>");
 
-        HttpClient client = new HttpClient("localhost", 10006, "/index.html");
+        HttpClient client = new HttpClient("localhost", 10006, "/showWorker.html");
         assertEquals("text/html", client.getResponseHeader("Content-Type"));
     }
 
@@ -75,4 +75,22 @@ class HttpServerTest {
         HttpClient client = new HttpClient("localhost", 10007, "/notFound.txt");
         assertEquals(404, client.getStatusCode());
     }
+
+    @Test
+    void shouldPostNewProduct() throws IOException {
+        HttpServer server = new HttpServer(10008);
+        HttpClient client = new HttpClient("localhost", 10008, "/api/newWorker", "POST", "full_name=wali&email_address=wgbjork@gmail.com");
+        assertEquals(200, client.getStatusCode());
+        assertEquals(List.of("wali"), server.getWorkerNames());
+    }
+
+    @Test
+    void shouldReturnExistingMembers() throws IOException {
+        HttpServer server = new HttpServer(10009);
+        server.getWorkerNames().add("wali");
+        HttpClient client = new HttpClient("localhost", 10009, "/api/showWorkers");
+        assertEquals("<ul><li>wali</li></ul>", client.getResponseBody());
+    }
+
+
 }
