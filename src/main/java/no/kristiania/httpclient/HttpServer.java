@@ -31,7 +31,7 @@ public class HttpServer {
                 }
             }
         }).start();  // Start the threads, so the code inside executes without blocking the current thread
-                     // Now the test does NOT have to wait for someone to connect
+        // Now the test does NOT have to wait for someone to connect
     }
     // This code will be executed for each client (connection)
     private void handleRequest(Socket clientSocket) throws IOException {
@@ -61,6 +61,8 @@ public class HttpServer {
                     body;
             // Write the response back to the client
             clientSocket.getOutputStream().write(response.getBytes());
+            return;
+
         } else {
             if (requestPath.equals("/echo")) {
                 handleEchoRequest(clientSocket, requestTarget, questionPos);
@@ -82,10 +84,14 @@ public class HttpServer {
                 if (file.getName().endsWith(".html")) {
                     contentType = "text/html";
                 }
+
+                if (file.getName().endsWith(".css")){
+                    contentType = "text/css";
+                }
                 String response = "HTTP/1.1 " + statusCode + " OK\r\n" +
                         "Content-Length: " + file.length() + "\r\n" +
-                        "Contention: close\r\n" +
                         "Content-Type: " + contentType + "\r\n" +
+                        "Connection: close\r\n" +
                         "\r\n";
                 clientSocket.getOutputStream().write(response.getBytes());
 
@@ -104,8 +110,10 @@ public class HttpServer {
         body += "</ul>";
         String response = "HTTP/1.1 200 OK\r\n" +
                 "Content-Length: " + body.length() + "\r\n" +
-                "Contention: close\r\n" +
-                "Content-Type: text/html\r\n" +
+                //Errorcheck, text/html?
+                "Content-Type: text/plain\r\n" +
+                "Connection: close\r\n" +
+
                 "\r\n" +
                 body;
 
@@ -130,6 +138,7 @@ public class HttpServer {
                 "Content-Length: " + body.length() + "\r\n" +
                 "Contention: close\r\n" +
                 "Content-Type: text/plain\r\n" +
+                "Connection: close\r\n" +
                 "\r\n" +
                 body;
 
