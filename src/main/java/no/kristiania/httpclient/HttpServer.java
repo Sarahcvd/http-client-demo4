@@ -61,6 +61,7 @@ public class HttpServer {
                     body;
             // Write the response back to the client
             clientSocket.getOutputStream().write(response.getBytes());
+
             return;
 
         } else {
@@ -113,7 +114,6 @@ public class HttpServer {
                 //Errorcheck, text/html?
                 "Content-Type: text/plain\r\n" +
                 "Connection: close\r\n" +
-
                 "\r\n" +
                 body;
 

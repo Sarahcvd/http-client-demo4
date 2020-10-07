@@ -21,7 +21,6 @@ public class HttpMessage {
         }
     }
 
-
     public static String readLine(Socket socket) throws IOException {
 
         // Reads one BYTE at a time, until there is nothing more to read
