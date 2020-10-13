@@ -62,7 +62,17 @@ public class WorkerDao {
         workers.add(worker);
     }
 
-    public List<String> list() {
+    public List<String> list() throws SQLException {
+        List<String> workers = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("select * from worker")) {
+                try (ResultSet rs = statement.executeQuery()) {
+                    while (rs.next()) {
+                        workers.add(rs.getString("full_name"));
+                    }
+                }
+            }
+        }
         return workers;
     }
 }
