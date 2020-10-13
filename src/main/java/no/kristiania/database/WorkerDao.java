@@ -1,5 +1,6 @@
 package no.kristiania.database;
 
+import org.flywaydb.core.Flyway;
 import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
@@ -25,6 +26,7 @@ public class WorkerDao {
         dataSource.setUrl("jdbc:postgresql://localhost:5432/kristianiaworker");
         dataSource.setUser("kristianiashop");
         dataSource.setPassword("harasilaw");
+        Flyway.configure().dataSource(dataSource).load().migrate();
 
         WorkerDao workerDao = new WorkerDao(dataSource);
 
@@ -42,7 +44,7 @@ public class WorkerDao {
 
     public void insert(String worker) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("INSERT INTO worker (full_name) VALUES (?)")) {
+            try (PreparedStatement statement = connection.prepareStatement("INSERT INTO worker (first_name) VALUES (?)")) {
                 statement.setString(1, worker);
                 statement.executeUpdate();
             }
@@ -55,7 +57,7 @@ public class WorkerDao {
             try (PreparedStatement statement = connection.prepareStatement("select * from worker")) {
                 try (ResultSet rs = statement.executeQuery()) {
                     while (rs.next()) {
-                        workers.add(rs.getString("full_name"));
+                        workers.add(rs.getString("first_name"));
                     }
                 }
             }

@@ -1,0 +1,1 @@
+alter table worker add column email_address varchar(100);
