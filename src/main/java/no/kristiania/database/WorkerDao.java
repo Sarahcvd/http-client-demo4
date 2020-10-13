@@ -2,6 +2,7 @@ package no.kristiania.database;
 
 import org.postgresql.ds.PGSimpleDataSource;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +14,12 @@ import java.util.Scanner;
 public class WorkerDao {
 
     private ArrayList<String> workers = new ArrayList<>();
+    private final DataSource dataSource;
+
+    public WorkerDao(DataSource dataSource) {
+
+        this.dataSource = dataSource;
+    }
 
     public static void main(String[] args) throws SQLException {
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
@@ -28,10 +35,8 @@ public class WorkerDao {
             try (PreparedStatement statement = connection.prepareStatement("INSERT INTO worker (full_name) VALUES (?)")) {
                 statement.setString(1, workerName);
                 statement.executeUpdate();
-
             }
         }
-
 
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("select * from worker")) {
@@ -45,7 +50,15 @@ public class WorkerDao {
         }
     }
 
-    public void insert(String worker) {
+
+
+    public void insert(String worker) throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("INSERT INTO worker (full_name) VALUES (?)")) {
+                statement.setString(1, worker);
+                statement.executeUpdate();
+            }
+        }
         workers.add(worker);
     }
 
