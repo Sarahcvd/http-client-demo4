@@ -18,13 +18,21 @@ class WorkerDaoTest {
         Flyway.configure().dataSource(dataSource).load().migrate();
 
         WorkerDao workerDao = new WorkerDao(dataSource);
-        String worker = exampleWorker();
+        Worker worker = exampleWorker();
         workerDao.insert(worker);
-        assertThat(workerDao.list()).contains(worker);
+        assertThat(workerDao.list())
+                .extracting(Worker::getName)
+                .contains(worker.getName());
+    }
+
+    private Worker exampleWorker(){
+        Worker worker = new Worker();
+        worker.setName(exampleWorkerName());
+        return worker;
     }
 
     /** Returns a random worker name */
-    private String exampleWorker() {
+    private String exampleWorkerName() {
         String[] options = {"Johannes", "Christian", "Lucas", "Matheus", "Markus"};
         Random random = new Random();
         return options[random.nextInt(options.length)];
