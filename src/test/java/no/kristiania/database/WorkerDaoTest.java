@@ -11,18 +11,33 @@ import java.util.Random;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class WorkerDaoTest {
+
+    private WorkerDao workerDao = new WorkerDao(createTestDataSource());
+
     @Test
     void shouldListInsertedWorkers() throws SQLException {
-        JdbcDataSource dataSource = new JdbcDataSource();
-        dataSource.setUrl("jdbc:h2:mem:testdatabase;DB_CLOSE_DELAY=-1");
-        Flyway.configure().dataSource(dataSource).load().migrate();
-
-        WorkerDao workerDao = new WorkerDao(dataSource);
         Worker worker = exampleWorker();
         workerDao.insert(worker);
         assertThat(workerDao.list())
                 .extracting(Worker::getName)
                 .contains(worker.getName());
+    }
+
+    @Test
+    void shouldRetrieveInsertedWorker() throws SQLException {
+        Worker worker = exampleWorker();
+        workerDao.insert(worker);
+        assertThat(worker).hasNoNullFieldsOrProperties();
+        assertThat(workerDao.retrieve(worker.getId()))
+                .usingFieldByFieldElementComparator()
+                .isEqualTo(worker);
+    }
+
+    private JdbcDataSource createTestDataSource(){
+        JdbcDataSource dataSource = new JdbcDataSource();
+        dataSource.setUrl("jdbc:h2:mem:testdatabase;DB_CLOSE_DELAY=-1");
+        Flyway.configure().dataSource(dataSource).load().migrate();
+        return dataSource;
     }
 
     private Worker exampleWorker(){
