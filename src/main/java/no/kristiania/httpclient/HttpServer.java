@@ -3,17 +3,19 @@ package no.kristiania.httpclient;
 
 import no.kristiania.database.WorkerDao;
 import org.postgresql.ds.PGSimpleDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.List;
 
 public class HttpServer {
+
+    private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
 
     private File contentRoot;
     private WorkerDao workerDao;
@@ -72,35 +74,41 @@ public class HttpServer {
             } else if (requestPath.equals("/api/showWorker")){
                 handleGetWorkers(clientSocket);
             } else {
-                File file = new File(contentRoot, requestPath);
-                if (!file.exists()) {
-                    String body = file + " does not exist";
-                    String response = "HTTP/1.1 404 Not Found\r\n" +
-                            "Content-Length: " + body.length() + "\r\n" +
-                            "\r\n" +
-                            body;
-                    clientSocket.getOutputStream().write(response.getBytes());
-                    return;
-                }
-                String statusCode = "200";
-                String contentType = "text/plain";
-                if (file.getName().endsWith(".html")) {
-                    contentType = "text/html";
-                }
-
-                if (file.getName().endsWith(".css")){
-                    contentType = "text/css";
-                }
-                String response = "HTTP/1.1 " + statusCode + " OK\r\n" +
-                        "Content-Length: " + file.length() + "\r\n" +
-                        "Content-Type: " + contentType + "\r\n" +
-                        "Connection: close\r\n" +
-                        "\r\n";
-                clientSocket.getOutputStream().write(response.getBytes());
-
-                new FileInputStream(file).transferTo(clientSocket.getOutputStream());
+                handleFileRequest(clientSocket, requestPath);
                 //return;
             }
+        }
+    }
+
+    private void handleFileRequest(Socket clientSocket, String requestPath) throws IOException {
+        try (InputStream inputStream = getClass().getResourceAsStream(requestPath)) {
+            if(inputStream == null){
+                String body = requestPath + " does not exist";
+                String response = "HTTP/1.1 404 Not Found\r\n" +
+                        "Content-Length: " + body.length() + "\r\n" +
+                        "\r\n" +
+                        body;
+                clientSocket.getOutputStream().write(response.getBytes());
+                return;
+            }
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            inputStream.transferTo(buffer);
+
+            String contentType = "text/plain";
+            if (requestPath.endsWith(".html")) {
+                contentType = "text/html";
+            }
+            if (requestPath.endsWith(".css")){
+                contentType = "text/css";
+            }
+
+            String response = "HTTP/1.1 200 OK\r\n" +
+                    "Content-Length: " + buffer.toByteArray().length + "\r\n" +
+                    "Content-Type: " + contentType + "\r\n" +
+                    "Connection: close\r\n" +
+                    "\r\n";
+            clientSocket.getOutputStream().write(response.getBytes());
+            clientSocket.getOutputStream().write(buffer.toByteArray());
         }
     }
 
@@ -151,13 +159,14 @@ public class HttpServer {
         dataSource.setUrl("jdbc:postgresql://localhost:5432/kristianiaworker");
         dataSource.setUser("kristianiashop");
         dataSource.setPassword("harasilaw");
+
         HttpServer server = new HttpServer(8080, dataSource);
         server.setContentRoot(new File("src/main/resources"));
+        logger.info("Started on http://localhost:{}/showWorker.html", 8080);
     }
 
     public void setContentRoot(File contentRoot) {
         this.contentRoot = contentRoot;
-
     }
 
     public List<String> getWorkerNames() throws SQLException {
