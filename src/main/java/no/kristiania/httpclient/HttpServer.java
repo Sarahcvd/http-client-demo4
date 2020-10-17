@@ -1,20 +1,25 @@
 package no.kristiania.httpclient;
 
 
+import no.kristiania.database.WorkerDao;
+import org.postgresql.ds.PGSimpleDataSource;
+
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.List;
 
 public class HttpServer {
 
     private File contentRoot;
-    private List<String> workerNames = new ArrayList<>();
+    private WorkerDao workerDao;
 
-    public HttpServer(int port) throws IOException {
+    public HttpServer(int port, DataSource dataSource) throws IOException {
+        workerDao = new WorkerDao(dataSource);
         // Open an entry point to our program for network clients
         ServerSocket serverSocket = new ServerSocket(port);
 
@@ -25,7 +30,7 @@ public class HttpServer {
                     // Accept waits for a client to try and connect - blocks until a connection is successful
                     Socket clientSocket = serverSocket.accept();
                     handleRequest(clientSocket);
-                }catch (IOException e) {
+                }catch (IOException | SQLException e) {
                     // If something went wrong with the connection - print out exception and try again
                     e.printStackTrace();
                 }
@@ -34,7 +39,7 @@ public class HttpServer {
         // Now the test does NOT have to wait for someone to connect
     }
     // This code will be executed for each client (connection)
-    private void handleRequest(Socket clientSocket) throws IOException {
+    private void handleRequest(Socket clientSocket) throws IOException, SQLException {
         HttpMessage request = new HttpMessage(clientSocket);
         String requestLine = request.getStartLine();
         System.out.println("REQUEST " + requestLine);
@@ -53,7 +58,7 @@ public class HttpServer {
         if(requestMethod.equals("POST")){
             QueryString requestedParameter = new QueryString(request.getBody());
 
-            workerNames.add(requestedParameter.getParameter("full_name"));
+            workerDao.insert(requestedParameter.getParameter("first_name"));
             String body = "Okay";
             String response = "HTTP/1.1 200 OK\r\n" +
                     "Content-Length: " + body.length() + "\r\n" +
@@ -61,9 +66,6 @@ public class HttpServer {
                     body;
             // Write the response back to the client
             clientSocket.getOutputStream().write(response.getBytes());
-
-            return;
-
         } else {
             if (requestPath.equals("/echo")) {
                 handleEchoRequest(clientSocket, requestTarget, questionPos);
@@ -102,17 +104,16 @@ public class HttpServer {
         }
     }
 
-    private void handleGetWorkers(Socket clientSocket) throws IOException {
+    private void handleGetWorkers(Socket clientSocket) throws IOException, SQLException {
         String body = "<ul>";
-        for (String workerName : workerNames) {
+        for (String workerName : workerDao.list()) {
             body += "<li>" + workerName + "</li>";
         }
 
         body += "</ul>";
         String response = "HTTP/1.1 200 OK\r\n" +
                 "Content-Length: " + body.length() + "\r\n" +
-                //Errorcheck, text/html?
-                "Content-Type: text/plain\r\n" +
+                "Content-Type: text/html\r\n" +
                 "Connection: close\r\n" +
                 "\r\n" +
                 body;
@@ -138,7 +139,6 @@ public class HttpServer {
                 "Content-Length: " + body.length() + "\r\n" +
                 "Contention: close\r\n" +
                 "Content-Type: text/plain\r\n" +
-                "Connection: close\r\n" +
                 "\r\n" +
                 body;
 
@@ -147,7 +147,11 @@ public class HttpServer {
     }
 
     public static void main(String[] args) throws IOException {
-        HttpServer server = new HttpServer(8080);
+        PGSimpleDataSource dataSource = new PGSimpleDataSource();
+        dataSource.setUrl("jdbc:postgresql://localhost:5432/kristianiaworker");
+        dataSource.setUser("kristianiashop");
+        dataSource.setPassword("harasilaw");
+        HttpServer server = new HttpServer(8080, dataSource);
         server.setContentRoot(new File("src/main/resources"));
     }
 
@@ -156,7 +160,7 @@ public class HttpServer {
 
     }
 
-    public List<String> getWorkerNames() {
-        return workerNames;
+    public List<String> getWorkerNames() throws SQLException {
+        return workerDao.list();
     }
 }

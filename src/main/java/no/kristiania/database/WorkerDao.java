@@ -33,36 +33,30 @@ public class WorkerDao {
         Scanner scanner = new Scanner(System.in);
         String workerName = scanner.nextLine();
 
-        Worker worker = new Worker();
-        worker.setName(workerName);
-        workerDao.insert(worker);
-        for (Worker _worker : workerDao.list()) {
-            System.out.println(_worker);
-        }
+        workerDao.insert(workerName);
+        System.out.println(workerDao.list());
     }
 
-    public void insert(Worker worker) throws SQLException {
+    public void insert(String worker) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("INSERT INTO worker (first_name) VALUES (?)")) {
-                statement.setString(1, worker.getName());
+                statement.setString(1, worker);
                 statement.executeUpdate();
             }
         }
     }
 
-    public List<Worker> list() throws SQLException {
-        List<Worker> workers = new ArrayList<>();
+    public List<String> list() throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("select * from worker")) {
                 try (ResultSet rs = statement.executeQuery()) {
+                    List<String> workers = new ArrayList<>();
                     while (rs.next()) {
-                        Worker worker = new Worker();
-                        worker.setName(rs.getString("first_name"));
-                        workers.add(worker);
+                        workers.add(rs.getString("first_name"));
                     }
+                    return workers;
                 }
             }
         }
-        return workers;
     }
 }

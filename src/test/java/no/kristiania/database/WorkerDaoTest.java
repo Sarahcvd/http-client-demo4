@@ -12,18 +12,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class WorkerDaoTest {
 
-    private WorkerDao workerDao = new WorkerDao(createTestDataSource());
+    // (Siste 2 slides forelesning 8)
+    // private WorkerDao workerDao = new WorkerDao(createTestDataSource());
 
     @Test
     void shouldListInsertedWorkers() throws SQLException {
-        Worker worker = exampleWorker();
+        JdbcDataSource dataSource = new JdbcDataSource();
+        dataSource.setUrl("jdbc:h2:mem:testdatabase;DB_CLOSE_DELAY=-1");
+
+        Flyway.configure().dataSource(dataSource).load().migrate();
+
+        WorkerDao workerDao = new WorkerDao(dataSource);
+        String worker = exampleWorkerName();
         workerDao.insert(worker);
-        assertThat(workerDao.list())
-                .extracting(Worker::getName)
-                .contains(worker.getName());
+        assertThat(workerDao.list()).contains(worker);
     }
 
-    @Test
+    // (Siste 2 slides forelesning 8)
+    /* @Test
     void shouldRetrieveInsertedWorker() throws SQLException {
         Worker worker = exampleWorker();
         workerDao.insert(worker);
@@ -32,19 +38,19 @@ class WorkerDaoTest {
                 .usingFieldByFieldElementComparator()
                 .isEqualTo(worker);
     }
-
+    // (Siste 2 slides forelesning 8)
     private JdbcDataSource createTestDataSource(){
         JdbcDataSource dataSource = new JdbcDataSource();
         dataSource.setUrl("jdbc:h2:mem:testdatabase;DB_CLOSE_DELAY=-1");
         Flyway.configure().dataSource(dataSource).load().migrate();
         return dataSource;
-    }
+    } */
 
-    private Worker exampleWorker(){
+    /* private Worker exampleWorker(){
         Worker worker = new Worker();
         worker.setName(exampleWorkerName());
         return worker;
-    }
+    } */
 
     /** Returns a random worker name */
     private String exampleWorkerName() {
