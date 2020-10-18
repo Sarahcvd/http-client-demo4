@@ -1,6 +1,7 @@
 package no.kristiania.httpclient;
 
 
+import no.kristiania.database.Worker;
 import no.kristiania.database.WorkerDao;
 import org.flywaydb.core.Flyway;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -60,7 +61,9 @@ public class HttpServer {
         if(requestMethod.equals("POST")){
             QueryString requestedParameter = new QueryString(request.getBody());
 
-            workerDao.insert(requestedParameter.getParameter("first_name"));
+            Worker worker = new Worker();
+            worker.setName(requestedParameter.getParameter("first_name"));
+            workerDao.insert(worker);
             String body = "Okay";
             String response = "HTTP/1.1 200 OK\r\n" +
                     "Content-Length: " + body.length() + "\r\n" +
