@@ -38,10 +38,12 @@ public class WorkerDao {
     public void insert(Worker worker) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO worker (first_name) VALUES (?)",
+                    "INSERT INTO worker (first_name, last_name, email_address) VALUES (?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS
                     )) {
                 statement.setString(1, worker.getFirstName());
+                statement.setString(2, worker.getLastName());
+                statement.setString(3, worker.getEmailAddress());
                 statement.executeUpdate();
 
                 try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -61,6 +63,8 @@ public class WorkerDao {
                         Worker worker = new Worker();
                         worker.setId(rs.getLong("id"));
                         worker.setFirstName(rs.getString("first_name"));
+                        worker.setLastName(rs.getString("last_name"));
+                        worker.setEmailAddress(rs.getString("email_address"));
                         return worker;
                     } else {
                         return null;

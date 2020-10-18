@@ -12,6 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class WorkerDaoTest {
     private WorkerDao workerDao;
+    private Random random = new Random();
+
 
     @BeforeEach
     void setUp() {
@@ -48,38 +50,25 @@ class WorkerDaoTest {
 
     private Worker exampleWorker() {
         Worker worker = new Worker();
-        worker.setFirstName(exampleWorkerName());
+        worker.setFirstName(exampleFirstName());
+        worker.setLastName(exampleLastName());
+        worker.setEmailAddress(exampleEmailAddress());
         return worker;
     }
 
-    // (Siste 2 slides forelesning 8)
-    /* @Test
-    void shouldRetrieveInsertedWorker() throws SQLException {
-        Worker worker = exampleWorker();
-        workerDao.insert(worker);
-        assertThat(worker).hasNoNullFieldsOrProperties();
-        assertThat(workerDao.retrieve(worker.getId()))
-                .usingFieldByFieldElementComparator()
-                .isEqualTo(worker);
-    }
-    // (Siste 2 slides forelesning 8)
-    private JdbcDataSource createTestDataSource(){
-        JdbcDataSource dataSource = new JdbcDataSource();
-        dataSource.setUrl("jdbc:h2:mem:testdatabase;DB_CLOSE_DELAY=-1");
-        Flyway.configure().dataSource(dataSource).load().migrate();
-        return dataSource;
-    } */
-
-    /* private Worker exampleWorker(){
-        Worker worker = new Worker();
-        worker.setName(exampleWorkerName());
-        return worker;
-    } */
-
-    /** Returns a random worker name */
-    private String exampleWorkerName() {
+    /** Returns a random first name */
+    private String exampleFirstName() {
         String[] options = {"Johannes", "Christian", "Lucas", "Matheus", "Markus"};
-        Random random = new Random();
+        return options[random.nextInt(options.length)];
+    }
+    /** Returns a random last name */
+    private String exampleLastName() {
+        String[] options = {"Johnsson", "Elfborg", "Colason", "Dobbelthode", "Trebein"};
+        return options[random.nextInt(options.length)];
+    }
+    /** Returns a random email-address */
+    private String exampleEmailAddress() {
+        String[] options = {"loller@lol.no", "jumper@jump.dk", "supreme@beta.uk", "simp@finlandia.se", "cheaptents@larsmonse.no"};
         return options[random.nextInt(options.length)];
     }
 }
