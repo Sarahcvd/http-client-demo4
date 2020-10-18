@@ -17,7 +17,6 @@ public class HttpServer {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
 
-    private File contentRoot;
     private WorkerDao workerDao;
 
     public HttpServer(int port, DataSource dataSource) throws IOException {
@@ -161,13 +160,9 @@ public class HttpServer {
         dataSource.setPassword("harasilaw");
 
         HttpServer server = new HttpServer(8080, dataSource);
-        server.setContentRoot(new File("src/main/resources"));
         logger.info("Started on http://localhost:{}/showWorker.html", 8080);
     }
 
-    public void setContentRoot(File contentRoot) {
-        this.contentRoot = contentRoot;
-    }
 
     public List<String> getWorkerNames() throws SQLException {
         return workerDao.list();
