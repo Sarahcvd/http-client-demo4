@@ -29,9 +29,8 @@ public class HttpServer {
         // New threads executes the code in a separate "thread", that is: In parallel
         new Thread(() -> {  // Anonymous function with code that will be executed in parallel (INFINITE LOOP!!)
             while (true){
-                try {
+                try(Socket clientSocket = serverSocket.accept()){
                     // Accept waits for a client to try and connect - blocks until a connection is successful
-                    Socket clientSocket = serverSocket.accept();
                     handleRequest(clientSocket);
                 }catch (IOException | SQLException e) {
                     // If something went wrong with the connection - print out exception and try again
