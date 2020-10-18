@@ -63,6 +63,7 @@ public class HttpServer {
             String body = "Okay";
             String response = "HTTP/1.1 200 OK\r\n" +
                     "Content-Length: " + body.length() + "\r\n" +
+                    "Connection: close\r\n" +
                     "\r\n" +
                     body;
             // Write the response back to the client
@@ -85,6 +86,7 @@ public class HttpServer {
                 String body = requestPath + " does not exist";
                 String response = "HTTP/1.1 404 Not Found\r\n" +
                         "Content-Length: " + body.length() + "\r\n" +
+                        "Connection: close\r\n" +
                         "\r\n" +
                         body;
                 clientSocket.getOutputStream().write(response.getBytes());
