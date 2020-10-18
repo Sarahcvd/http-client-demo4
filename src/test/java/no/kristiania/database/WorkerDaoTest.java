@@ -5,7 +5,6 @@ import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Random;
 
@@ -28,13 +27,17 @@ class WorkerDaoTest {
 
     @Test
     void shouldListInsertedWorkers() throws SQLException {
-        Worker worker = exampleWorker();
-        workerDao.insert(worker);
-        assertThat(workerDao.list()).contains(worker.getName());
+        Worker worker1 = exampleWorker();
+        Worker worker2 = exampleWorker();
+        workerDao.insert(worker1);
+        workerDao.insert(worker2);
+        assertThat(workerDao.list()).contains(worker1.getFirstName(), worker2.getFirstName());
     }
 
     @Test
     void shouldRetrieveAllWorkerProperties() throws SQLException {
+        workerDao.insert(exampleWorker());
+        workerDao.insert(exampleWorker());
         Worker worker = exampleWorker();
         workerDao.insert(worker);
         assertThat(worker).hasNoNullFieldsOrProperties();
@@ -45,7 +48,7 @@ class WorkerDaoTest {
 
     private Worker exampleWorker() {
         Worker worker = new Worker();
-        worker.setName(exampleWorkerName());
+        worker.setFirstName(exampleWorkerName());
         return worker;
     }
 

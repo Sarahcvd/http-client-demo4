@@ -62,7 +62,7 @@ public class HttpServer {
             QueryString requestedParameter = new QueryString(request.getBody());
 
             Worker worker = new Worker();
-            worker.setName(requestedParameter.getParameter("first_name"));
+            worker.setFirstName(requestedParameter.getParameter("first_name"));
             workerDao.insert(worker);
             String body = "Okay";
             String response = "HTTP/1.1 200 OK\r\n" +

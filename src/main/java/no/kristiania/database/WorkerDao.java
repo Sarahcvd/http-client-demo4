@@ -29,7 +29,7 @@ public class WorkerDao {
         System.out.println("Please enter worker name:");
         Scanner scanner = new Scanner(System.in);
         Worker worker = new Worker();
-        worker.setName(scanner.nextLine());
+        worker.setFirstName(scanner.nextLine());
 
         workerDao.insert(worker);
         System.out.println(workerDao.list());
@@ -41,7 +41,7 @@ public class WorkerDao {
                     "INSERT INTO worker (first_name) VALUES (?)",
                     Statement.RETURN_GENERATED_KEYS
                     )) {
-                statement.setString(1, worker.getName());
+                statement.setString(1, worker.getFirstName());
                 statement.executeUpdate();
 
                 try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -60,7 +60,7 @@ public class WorkerDao {
                     if (rs.next()) {
                         Worker worker = new Worker();
                         worker.setId(rs.getLong("id"));
-                        worker.setName(rs.getString("first_name"));
+                        worker.setFirstName(rs.getString("first_name"));
                         return worker;
                     } else {
                         return null;

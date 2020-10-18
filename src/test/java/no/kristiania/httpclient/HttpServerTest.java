@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.List;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -104,7 +103,7 @@ class HttpServerTest {
         HttpServer server = new HttpServer(10009, dataSource);
         WorkerDao workerDao = new WorkerDao(dataSource);
         Worker worker = new Worker();
-        worker.setName("wali");
+        worker.setFirstName("wali");
         workerDao.insert(worker);
         HttpClient client = new HttpClient("localhost", 10009, "/api/showWorker");
         assertThat(client.getResponseBody()).contains("<li>wali</li>");
