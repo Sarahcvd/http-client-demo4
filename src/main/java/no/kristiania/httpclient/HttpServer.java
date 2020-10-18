@@ -119,8 +119,8 @@ public class HttpServer {
 
     private void handleGetWorkers(Socket clientSocket) throws IOException, SQLException {
         String body = "<ul>";
-        for (String workerName : workerDao.list()) {
-            body += "<li>" + workerName + "</li>";
+        for (Worker worker : workerDao.list()) {
+            body += "<li>" + worker.getFirstName() + " " + worker.getLastName() + " " + worker.getEmailAddress() + "</li>";
         }
 
         body += "</ul>";
@@ -177,7 +177,7 @@ public class HttpServer {
     }
 
 
-    public List<String> getWorkerNames() throws SQLException {
+    public List<Worker> getWorkerNames() throws SQLException {
         return workerDao.list();
     }
 }

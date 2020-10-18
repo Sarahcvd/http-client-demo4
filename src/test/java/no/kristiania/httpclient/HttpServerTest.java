@@ -95,7 +95,9 @@ class HttpServerTest {
         HttpServer server = new HttpServer(10008, dataSource);
         HttpClient client = new HttpClient("localhost", 10008, "/api/newWorker", "POST", "full_name=wali&email_address=wgbjork@gmail.com");
         assertEquals(200, client.getStatusCode());
-        assertThat(server.getWorkerNames()).contains("wali");
+        assertThat(server.getWorkerNames())
+                .extracting(Worker::getFirstName)
+                .contains("wali");
     }
 
     @Test
@@ -104,9 +106,11 @@ class HttpServerTest {
         WorkerDao workerDao = new WorkerDao(dataSource);
         Worker worker = new Worker();
         worker.setFirstName("wali");
+        worker.setLastName("gustav");
+        worker.setEmailAddress("lol@england.no");
         workerDao.insert(worker);
         HttpClient client = new HttpClient("localhost", 10009, "/api/showWorker");
-        assertThat(client.getResponseBody()).contains("<li>wali</li>");
+        assertThat(client.getResponseBody()).contains("<li>wali gustav lol@england.no</li>");
     }
 
 
