@@ -48,7 +48,7 @@ public class WorkerDao {
     }
 
     public Worker retrieve(Long id) {
-        return null;
+        return new Worker();
     }
 
     public List<String> list() throws SQLException {
