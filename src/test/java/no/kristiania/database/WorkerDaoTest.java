@@ -44,7 +44,9 @@ class WorkerDaoTest {
     }
 
     private Worker exampleWorker() {
-        return new Worker();
+        Worker worker = new Worker();
+        worker.setName(exampleWorkerName());
+        return worker;
     }
 
     // (Siste 2 slides forelesning 8)
