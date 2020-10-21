@@ -10,11 +10,11 @@ public class HttpClient {
     private Map<String, String> responseHeaders = new HashMap<>();
     private String responseBody;
 
-    public HttpClient(String hostname, int port, String requestTarget) throws IOException {
+    public HttpClient(final String hostname, int port, final String requestTarget) throws IOException {
         this(hostname, port, requestTarget, "GET", null);
     }
 
-    public HttpClient(String hostname, int port, String requestTarget, final String httpMethod, String requestBody) throws IOException {
+    public HttpClient(final String hostname, int port, String requestTarget, final String httpMethod, String requestBody) throws IOException {
         Socket socket = new Socket(hostname, port);
 
         String contentLengthHeader = requestBody != null ? "Content-Length: " + requestBody.length() + "\r\n" : "";
@@ -42,7 +42,6 @@ public class HttpClient {
 
         statusCode = Integer.parseInt(responseLineParts[1]);
     }
-
 
     public static void main(String[] args) throws IOException {
         String hostname = "urlecho.appspot.com";

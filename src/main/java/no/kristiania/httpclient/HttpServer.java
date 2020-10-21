@@ -45,17 +45,14 @@ public class HttpServer {
     private void handleRequest(Socket clientSocket) throws IOException, SQLException {
         HttpMessage request = new HttpMessage(clientSocket);
         String requestLine = request.getStartLine();
-        System.out.println("REQUEST " + requestLine);
         // Example "GET /echo?body=hello HTTP/1.1"  (this is what the browser writes)
 
         // Example GET, POST, PUT, DELETE etc
         String requestMethod = requestLine.split(" ")[0];
-
         String requestTarget = requestLine.split(" ")[1];
         // Example "GET /echo?body=hello"
 
         int questionPos = requestTarget.indexOf('?');
-
         String requestPath = questionPos != -1 ? requestTarget.substring(0, questionPos) : requestTarget;
 
         if(requestMethod.equals("POST")){
@@ -63,6 +60,8 @@ public class HttpServer {
 
             Worker worker = new Worker();
             worker.setFirstName(requestedParameter.getParameter("first_name"));
+            worker.setLastName(requestedParameter.getParameter("last_name"));
+            worker.setEmailAddress(requestedParameter.getParameter("email_address"));
             workerDao.insert(worker);
             String body = "Okay";
             String response = "HTTP/1.1 200 OK\r\n" +
@@ -75,11 +74,10 @@ public class HttpServer {
         } else {
             if (requestPath.equals("/echo")) {
                 handleEchoRequest(clientSocket, requestTarget, questionPos);
-            } else if (requestPath.equals("/api/showWorker")){
+            } else if (requestPath.equals("/worker")){
                 handleGetWorkers(clientSocket);
             } else {
                 handleFileRequest(clientSocket, requestPath);
-                //return;
             }
         }
     }
@@ -163,6 +161,8 @@ public class HttpServer {
         Properties properties = new Properties();
         try (FileReader fileReader = new FileReader("pgr203.properties")) {
             properties.load(fileReader);
+        } catch (Exception e) {
+            System.out.println(e);
         }
 
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
@@ -173,7 +173,7 @@ public class HttpServer {
         Flyway.configure().dataSource(dataSource).load().migrate();
 
         HttpServer server = new HttpServer(8080, dataSource);
-        logger.info("Started on http://localhost:{}/showWorker.html", 8080);
+        logger.info("Started on http://localhost:8080/showWorker.html: {}", 8080);
     }
 
 

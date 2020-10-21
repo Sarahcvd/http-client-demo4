@@ -1,13 +1,9 @@
 package no.kristiania.database;
 
-import org.flywaydb.core.Flyway;
-import org.postgresql.ds.PGSimpleDataSource;
-
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class WorkerDao {
 
@@ -15,24 +11,6 @@ public class WorkerDao {
 
     public WorkerDao(DataSource dataSource) {
         this.dataSource = dataSource;
-    }
-
-    public static void main(String[] args) throws SQLException {
-        PGSimpleDataSource dataSource = new PGSimpleDataSource();
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/kristianiaworker");
-        dataSource.setUser("kristianiashop");
-        dataSource.setPassword("harasilaw");
-        Flyway.configure().dataSource(dataSource).load().migrate();
-
-        WorkerDao workerDao = new WorkerDao(dataSource);
-
-        System.out.println("Please enter worker name:");
-        Scanner scanner = new Scanner(System.in);
-        Worker worker = new Worker();
-        worker.setFirstName(scanner.nextLine());
-
-        workerDao.insert(worker);
-        System.out.println(workerDao.list());
     }
 
     public void insert(Worker worker) throws SQLException {
@@ -84,7 +62,12 @@ public class WorkerDao {
                 try (ResultSet rs = statement.executeQuery()) {
                     List<Worker> workers = new ArrayList<>();
                     while (rs.next()) {
+                        Worker worker = new Worker();
                         workers.add(mapRowToWorker(rs));
+                        rs.getString("first_name");
+                        rs.getString("last_name");
+                        rs.getString("email_address");
+                        worker.setId(rs.getLong("id"));
                     }
                     return workers;
                 }

@@ -24,9 +24,6 @@ class WorkerDaoTest {
         workerDao = new WorkerDao(dataSource);
     }
 
-    // (Siste 2 slides forelesning 8)
-    // private WorkerDao workerDao = new WorkerDao(createTestDataSource());
-
     @Test
     void shouldListInsertedWorkers() throws SQLException {
         Worker worker1 = exampleWorker();
