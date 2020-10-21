@@ -109,7 +109,7 @@ class HttpServerTest {
         worker.setLastName("gustav");
         worker.setEmailAddress("lol@england.no");
         workerDao.insert(worker);
-        HttpClient client = new HttpClient("localhost", 10009, "/worker");
+        HttpClient client = new HttpClient("localhost", 10009, "/api/worker");
         assertThat(client.getResponseBody()).contains("<li>wali gustav lol@england.no</li>");
     }
 

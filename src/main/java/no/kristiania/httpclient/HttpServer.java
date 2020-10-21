@@ -12,6 +12,8 @@ import javax.sql.DataSource;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
@@ -57,11 +59,13 @@ public class HttpServer {
 
         if(requestMethod.equals("POST")){
             QueryString requestedParameter = new QueryString(request.getBody());
+            String decodedOutput = URLDecoder.decode(requestedParameter.getParameter("email_address"), StandardCharsets.UTF_8);
 
             Worker worker = new Worker();
             worker.setFirstName(requestedParameter.getParameter("first_name"));
             worker.setLastName(requestedParameter.getParameter("last_name"));
-            worker.setEmailAddress(requestedParameter.getParameter("email_address"));
+            worker.setEmailAddress(decodedOutput);
+
             workerDao.insert(worker);
             String body = "Okay";
             String response = "HTTP/1.1 200 OK\r\n" +
@@ -74,7 +78,7 @@ public class HttpServer {
         } else {
             if (requestPath.equals("/echo")) {
                 handleEchoRequest(clientSocket, requestTarget, questionPos);
-            } else if (requestPath.equals("/worker")){
+            } else if (requestPath.equals("/api/worker")){
                 handleGetWorkers(clientSocket);
             } else {
                 handleFileRequest(clientSocket, requestPath);
@@ -158,6 +162,7 @@ public class HttpServer {
     }
 
     public static void main(String[] args) throws IOException {
+        PGSimpleDataSource dataSource = new PGSimpleDataSource();
         Properties properties = new Properties();
         try (FileReader fileReader = new FileReader("pgr203.properties")) {
             properties.load(fileReader);
@@ -165,7 +170,6 @@ public class HttpServer {
             System.out.println(e);
         }
 
-        PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setUrl(properties.getProperty("dataSource.url"));
         dataSource.setUser(properties.getProperty("dataSource.username"));
         dataSource.setPassword(properties.getProperty("dataSource.password"));

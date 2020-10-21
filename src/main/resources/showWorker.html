@@ -10,7 +10,7 @@
 <div id="showWorker"></div>
 </body>
 <script>
-    fetch("/worker").then(response => response.text()).then(html => {
+    fetch("/api/worker").then(response => response.text()).then(html => {
         document.getElementById("showWorker").innerHTML = html
     });
 </script>
