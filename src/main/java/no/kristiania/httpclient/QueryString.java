@@ -18,8 +18,6 @@ public class QueryString {
     public String getParameter(String key) {
         return parameters.get(key);
     }
-
-    //Errorcheck (not used)
     public String getQueryString(){
         StringBuilder result = new StringBuilder();
         for(Map.Entry<String, String> parameter : parameters.entrySet()){
@@ -32,7 +30,6 @@ public class QueryString {
         }
         return "?" + result.toString();
     }
-    //Errorcheck (not used)
     public void addParameter(String key, String value){
         parameters.put(key, value);
     }
